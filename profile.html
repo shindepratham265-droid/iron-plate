@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IronPlate — Your Profile</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">IP</div>
+      <span class="nav-logo-name">IronPlate</span>
+    </a>
+    <div class="nav-actions">
+      <div class="nav-avatar" id="nav-avatar">?</div>
+    </div>
+  </div>
+</nav>
+
+<div class="profile-page">
+
+  <div class="profile-hero">
+    <div class="profile-hero-tag">Step 1 of 1</div>
+    <h1 class="profile-hero-title">Tell us about yourself 📋</h1>
+    <p class="profile-hero-sub">We use this info to personalise your diet &amp; exercise plan. You won't be asked again.</p>
+  </div>
+
+  <!-- Progress indicator -->
+  <div class="progress-steps">
+    <div class="prog-step active" id="ps1"><span class="prog-num">1</span>Body Stats</div>
+    <div class="prog-step" id="ps2"><span class="prog-num">2</span>Activity</div>
+    <div class="prog-step" id="ps3"><span class="prog-num">3</span>Your Goal</div>
+  </div>
+
+  <!-- ── STEP 1: Body Stats ── -->
+  <div id="step1">
+    <div class="profile-card">
+      <div class="profile-card-title"><span>📏</span> Body Measurements</div>
+      <div class="input-grid-3">
+        <div class="form-group">
+          <label class="form-label">Age (years)</label>
+          <input type="number" class="form-input" id="p-age" min="10" max="100" placeholder="e.g. 25"/>
+          <div class="form-error" id="e-age">Enter age between 10–100.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Weight (kg)</label>
+          <input type="number" class="form-input" id="p-weight" min="30" max="300" placeholder="e.g. 72"/>
+          <div class="form-error" id="e-weight">Enter weight 30–300 kg.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Height (cm)</label>
+          <input type="number" class="form-input" id="p-height" min="100" max="250" placeholder="e.g. 175"/>
+          <div class="form-error" id="e-height">Enter height 100–250 cm.</div>
+        </div>
+      </div>
+      <div class="input-grid">
+        <div class="form-group">
+          <label class="form-label">Biological Sex</label>
+          <select class="form-input" id="p-sex">
+            <option value="">Select…</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Prefer not to say</option>
+          </select>
+          <div class="form-error" id="e-sex">Please select.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Daily Steps (avg)</label>
+          <input type="number" class="form-input" id="p-steps" min="0" max="50000" placeholder="e.g. 6000"/>
+          <div class="form-error" id="e-steps">Enter realistic steps count.</div>
+        </div>
+      </div>
+    </div>
+    <div class="flex" style="justify-content:flex-end">
+      <button class="btn btn-primary" onclick="goStep(2)">Next: Activity →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: Activity ── -->
+  <div id="step2" class="hidden">
+    <div class="profile-card">
+      <div class="profile-card-title"><span>🏃</span> Activity Level</div>
+      <div class="form-label mb-8">How active are you during the week?</div>
+      <div class="pill-group" id="activity-pills">
+        <button class="pill" data-val="sedentary"    onclick="selectPill(this,'activity-pills')">🛋️ Sedentary (desk job, no exercise)</button>
+        <button class="pill" data-val="light"        onclick="selectPill(this,'activity-pills')">🚶 Lightly Active (1–3 days/week)</button>
+        <button class="pill" data-val="moderate"     onclick="selectPill(this,'activity-pills')">🏊 Moderately Active (3–5 days/week)</button>
+        <button class="pill" data-val="very"         onclick="selectPill(this,'activity-pills')">🏋️ Very Active (6–7 days/week)</button>
+        <button class="pill" data-val="extra"        onclick="selectPill(this,'activity-pills')">⚡ Extra Active (athlete / 2x/day)</button>
+      </div>
+      <div class="form-error mt-8" id="e-activity">Please select your activity level.</div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-card-title"><span>🏅</span> Primary Sport / Focus <span style="font-size:13px;font-weight:400;color:var(--muted);">(optional)</span></div>
+      <div class="pill-group" id="sport-pills">
+        <button class="pill" data-val="bodybuilding" onclick="selectPill(this,'sport-pills')">🏋️ Bodybuilding</button>
+        <button class="pill" data-val="strength"     onclick="selectPill(this,'sport-pills')">💪 Strength / Powerlifting</button>
+        <button class="pill" data-val="cardio"       onclick="selectPill(this,'sport-pills')">🏃 Running / Cardio</button>
+        <button class="pill" data-val="yoga"         onclick="selectPill(this,'sport-pills')">🧘 Yoga / Flexibility</button>
+        <button class="pill" data-val="sports"       onclick="selectPill(this,'sport-pills')">⚽ Team Sports</button>
+        <button class="pill" data-val="general"      onclick="selectPill(this,'sport-pills')">🌟 General Fitness</button>
+      </div>
+    </div>
+
+    <div class="flex" style="justify-content:space-between">
+      <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Next: Your Goal →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: Goal ── -->
+  <div id="step3" class="hidden">
+    <div class="profile-card">
+      <div class="profile-card-title"><span>🎯</span> What's Your Main Goal?</div>
+      <div class="goal-grid" id="goal-cards">
+        <div class="goal-card" data-val="lose"        onclick="selectGoal(this)"><div class="goal-icon">📉</div><div class="goal-title">Lose Weight</div></div>
+        <div class="goal-card" data-val="gain"        onclick="selectGoal(this)"><div class="goal-icon">📈</div><div class="goal-title">Gain Muscle</div></div>
+        <div class="goal-card" data-val="maintain"    onclick="selectGoal(this)"><div class="goal-icon">⚖️</div><div class="goal-title">Maintain Weight</div></div>
+        <div class="goal-card" data-val="bulk"        onclick="selectGoal(this)"><div class="goal-icon">🔥</div><div class="goal-title">Bulk (Mass Gain)</div></div>
+        <div class="goal-card" data-val="cut"         onclick="selectGoal(this)"><div class="goal-icon">✂️</div><div class="goal-title">Cut (Lean Out)</div></div>
+        <div class="goal-card" data-val="athletic"    onclick="selectGoal(this)"><div class="goal-icon">🏆</div><div class="goal-title">Athletic Performance</div></div>
+      </div>
+      <div class="form-error mt-8" id="e-goal">Please select a goal.</div>
+    </div>
+
+    <!-- BMI preview -->
+    <div class="profile-card" id="bmi-card" style="display:none">
+      <div class="profile-card-title"><span>📊</span> Your Stats Preview</div>
+      <div style="display:flex;gap:20px;flex-wrap:wrap">
+        <div style="flex:1;min-width:120px;background:var(--bg);padding:16px;border-radius:10px;text-align:center">
+          <div style="font-size:28px;font-weight:800;font-family:var(--font-h);color:var(--blue)" id="bmi-val">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">BMI</div>
+          <div style="font-size:11px;font-weight:600;margin-top:4px" id="bmi-cat">—</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg);padding:16px;border-radius:10px;text-align:center">
+          <div style="font-size:28px;font-weight:800;font-family:var(--font-h);color:var(--purple)" id="tdee-val">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Daily Calories (TDEE)</div>
+        </div>
+        <div style="flex:1;min-width:120px;background:var(--bg);padding:16px;border-radius:10px;text-align:center">
+          <div style="font-size:28px;font-weight:800;font-family:var(--font-h);color:var(--green)" id="goal-cal">—</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Target Calories</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex" style="justify-content:space-between">
+      <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary btn-lg" id="btn-save" onclick="saveProfile()">Save & Continue 🚀</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

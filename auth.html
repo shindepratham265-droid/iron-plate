@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IronPlate — Login / Register</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">IP</div>
+      <span class="nav-logo-name">IronPlate</span>
+    </a>
+    <div class="nav-actions">
+      <a href="index.html" class="btn btn-white btn-sm">← Back to Home</a>
+    </div>
+  </div>
+</nav>
+
+<div class="auth-page">
+  <div class="auth-card" id="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <div class="auth-logo-mark">IP</div>
+      <span class="auth-logo-name">IronPlate</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="auth-tabs">
+      <button class="tab active" onclick="switchTab('login')">Log In</button>
+      <button class="tab" onclick="switchTab('register')">Register</button>
+    </div>
+
+    <!-- ── LOGIN FORM ── -->
+    <div id="form-login">
+      <div class="auth-title">Welcome back 👋</div>
+      <div class="auth-sub">Log in to continue your fitness journey</div>
+
+      <div class="form-group mt-24">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="li-email" placeholder="you@email.com"/>
+        <div class="form-error" id="li-email-err">Please enter a valid email.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="li-pass" placeholder="••••••••"/>
+        <div class="form-error" id="li-pass-err">Password is required.</div>
+      </div>
+
+      <button class="btn btn-primary btn-full mt-8" id="btn-login" onclick="doLogin()">
+        Log In →
+      </button>
+      <div class="auth-switch mt-16">
+        Don't have an account? <a onclick="switchTab('register')">Register free</a>
+      </div>
+    </div>
+
+    <!-- ── REGISTER FORM ── -->
+    <div id="form-register" class="hidden">
+      <div class="auth-title">Create Account ✨</div>
+      <div class="auth-sub">Join IronPlate and start your transformation</div>
+
+      <div class="form-row mt-24">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input type="text" class="form-input" id="reg-first" placeholder="John"/>
+          <div class="form-error" id="reg-first-err">Required.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input type="text" class="form-input" id="reg-last" placeholder="Doe"/>
+          <div class="form-error" id="reg-last-err">Required.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="reg-email" placeholder="you@email.com"/>
+        <div class="form-error" id="reg-email-err">Enter a valid email.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="reg-pass" placeholder="Min. 8 characters" oninput="checkStrength(this.value)"/>
+        <div class="strength-bar mt-8" id="strength-bar">
+          <div class="strength-seg" id="s1"></div>
+          <div class="strength-seg" id="s2"></div>
+          <div class="strength-seg" id="s3"></div>
+          <div class="strength-seg" id="s4"></div>
+        </div>
+        <div class="form-hint" id="strength-label">Use 8+ chars, numbers & symbols</div>
+        <div class="form-error" id="reg-pass-err">Minimum 8 characters.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm Password</label>
+        <input type="password" class="form-input" id="reg-pass2" placeholder="••••••••"/>
+        <div class="form-error" id="reg-pass2-err">Passwords do not match.</div>
+      </div>
+
+      <button class="btn btn-primary btn-full mt-8" id="btn-reg" onclick="doRegister()">
+        Create Account →
+      </button>
+      <div class="auth-switch mt-16">
+        Already have an account? <a onclick="switchTab('login')">Log In</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

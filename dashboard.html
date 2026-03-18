@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IronPlate — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">IP</div>
+      <span class="nav-logo-name">IronPlate</span>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link active">Dashboard</a>
+      <a href="diet.html"      class="nav-link">Diet Plan</a>
+      <a href="exercise.html"  class="nav-link">Exercise</a>
+      <a href="muscle.html"    class="nav-link">Muscle Growth</a>
+    </div>
+    <div class="nav-actions">
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">Log Out</button>
+      <div class="nav-avatar" id="nav-avatar">?</div>
+    </div>
+    <button class="nav-ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mob-menu" id="mob-menu">
+  <a href="dashboard.html" class="mob-link active">Dashboard</a>
+  <a href="diet.html"      class="mob-link">Diet Plan</a>
+  <a href="exercise.html"  class="mob-link">Exercise</a>
+  <a href="muscle.html"    class="mob-link">Muscle Growth</a>
+</div>
+
+<div class="dash-wrap">
+
+  <!-- Hero greeting -->
+  <div class="page-hero">
+    <div class="page-hero-tag">Dashboard</div>
+    <h1 class="page-hero-title" id="greeting">Good morning! 👋</h1>
+    <p class="page-hero-sub" id="dash-sub">Here's your fitness overview for today.</p>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="dash-grid" id="stat-grid">
+    <div class="stat-card" style="animation-delay:.05s">
+      <div class="stat-icon">🔥</div>
+      <div class="stat-val" id="s-cal">—</div>
+      <div class="stat-lbl">Target Calories</div>
+      <div class="stat-change up" id="s-cal-ch"></div>
+    </div>
+    <div class="stat-card" style="animation-delay:.1s">
+      <div class="stat-icon">⚖️</div>
+      <div class="stat-val" id="s-weight">—</div>
+      <div class="stat-lbl">Body Weight (kg)</div>
+      <div class="stat-change" id="s-bmi">BMI: —</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.15s">
+      <div class="stat-icon">👟</div>
+      <div class="stat-val" id="s-steps">—</div>
+      <div class="stat-lbl">Daily Steps Goal</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.2s">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-val" id="s-goal">—</div>
+      <div class="stat-lbl">Your Goal</div>
+    </div>
+  </div>
+
+  <!-- Main content row -->
+  <div class="dash-main">
+    <!-- Activity chart -->
+    <div class="dash-card">
+      <div class="dash-card-title">
+        Weekly Activity
+        <span style="font-size:13px;font-weight:400;color:var(--muted)">Last 7 days</span>
+      </div>
+      <div class="act-chart" id="act-chart"></div>
+    </div>
+
+    <!-- Macro rings -->
+    <div class="dash-card">
+      <div class="dash-card-title">Daily Macros</div>
+      <div class="macro-rings" id="macro-rings">
+        <div class="loader"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 section cards -->
+  <div style="margin-bottom:24px">
+    <div class="page-hero-tag">Explore</div>
+    <h2 style="font-family:var(--font-h);font-size:26px;font-weight:800;color:var(--text);letter-spacing:-1px;margin-top:8px">What would you like to do today?</h2>
+  </div>
+  <div class="section-cards">
+    <a href="diet.html" class="sec-card sec-card-diet" style="animation-delay:.05s">
+      <div class="sec-icon">🥗</div>
+      <div class="sec-title">Diet Plan</div>
+      <div class="sec-desc">Personalised meals with exact macros for your goal.</div>
+      <div class="sec-arrow">→</div>
+    </a>
+    <a href="exercise.html" class="sec-card sec-card-ex" style="animation-delay:.1s">
+      <div class="sec-icon">🏋️</div>
+      <div class="sec-title">Exercise Plan</div>
+      <div class="sec-desc">28+ exercises across 7 muscle groups with coaching tips.</div>
+      <div class="sec-arrow">→</div>
+    </a>
+    <a href="muscle.html" class="sec-card sec-card-muscle" style="animation-delay:.15s">
+      <div class="sec-icon">💪</div>
+      <div class="sec-title">Muscle Growth</div>
+      <div class="sec-desc">Watch your skeleton grow muscles as you train daily.</div>
+      <div class="sec-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- Profile quick-edit -->
+  <div class="dash-card" style="margin-top:24px">
+    <div class="dash-card-title">
+      Your Profile
+      <a href="profile.html" class="btn btn-white btn-sm">Edit Profile</a>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap" id="profile-chips"></div>
+  </div>
+
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>

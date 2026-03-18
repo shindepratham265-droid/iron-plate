@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IronPlate — Diet Plan</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">IP</div>
+      <span class="nav-logo-name">IronPlate</span>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="diet.html"      class="nav-link active">Diet Plan</a>
+      <a href="exercise.html"  class="nav-link">Exercise</a>
+      <a href="muscle.html"    class="nav-link">Muscle Growth</a>
+    </div>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-white btn-sm">← Dashboard</a>
+      <div class="nav-avatar" id="nav-avatar">?</div>
+    </div>
+    <button class="nav-ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mob-menu" id="mob-menu">
+  <a href="dashboard.html" class="mob-link">Dashboard</a>
+  <a href="diet.html"      class="mob-link active">Diet Plan</a>
+  <a href="exercise.html"  class="mob-link">Exercise</a>
+  <a href="muscle.html"    class="mob-link">Muscle Growth</a>
+</div>
+
+<div class="diet-wrap">
+
+  <div class="page-hero">
+    <div class="page-hero-tag">Section 01</div>
+    <h1 class="page-hero-title">Diet Plan 🥗</h1>
+    <p class="page-hero-sub">Choose your food preferences, then get a personalised 4-meal plan.</p>
+  </div>
+
+  <!-- Food Preferences -->
+  <div class="dash-card">
+    <div class="dash-card-title">
+      Food Preferences
+      <span style="font-size:13px;font-weight:400;color:var(--muted)">Pick 1–3 that apply</span>
+    </div>
+    <div class="pref-grid" id="pref-grid">
+      <div class="pref-card" data-val="veg" onclick="togglePref(this)">
+        <div class="pref-icon">🥦</div>
+        <div class="pref-name">Vegetarian</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+      <div class="pref-card" data-val="nonveg" onclick="togglePref(this)">
+        <div class="pref-icon">🍗</div>
+        <div class="pref-name">Non-Vegetarian</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+      <div class="pref-card" data-val="vegan" onclick="togglePref(this)">
+        <div class="pref-icon">🌱</div>
+        <div class="pref-name">Vegan</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+      <div class="pref-card" data-val="keto" onclick="togglePref(this)">
+        <div class="pref-icon">🥑</div>
+        <div class="pref-name">Keto</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+      <div class="pref-card" data-val="paleo" onclick="togglePref(this)">
+        <div class="pref-icon">🥩</div>
+        <div class="pref-name">Paleo</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+      <div class="pref-card" data-val="mediterranean" onclick="togglePref(this)">
+        <div class="pref-icon">🫒</div>
+        <div class="pref-name">Mediterranean</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+      <div class="pref-card" data-val="glutenfree" onclick="togglePref(this)">
+        <div class="pref-icon">🌾</div>
+        <div class="pref-name">Gluten-Free</div>
+        <div class="pref-cnt">✓ Selected</div>
+      </div>
+    </div>
+    <div id="pref-warn" style="display:none;margin-top:10px;font-size:13px;color:var(--red)">⚠ Maximum 3 preferences allowed.</div>
+    <button class="btn btn-primary mt-20" onclick="generatePlan()">Generate My Meal Plan ✨</button>
+  </div>
+
+  <!-- Calorie overview (hidden until generated) -->
+  <div id="plan-section" class="hidden">
+
+    <div class="cal-card">
+      <div class="macro-strip" style="justify-content:space-between;align-items:center">
+        <div>
+          <div class="cal-big" id="d-cal">2000</div>
+          <div class="cal-lbl">Daily Target Calories</div>
+        </div>
+        <div class="macro-strip">
+          <div class="macro-item">
+            <div class="macro-val" id="d-prot">150g</div>
+            <div class="macro-name">Protein</div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-val" id="d-carbs">225g</div>
+            <div class="macro-name">Carbs</div>
+          </div>
+          <div class="macro-item">
+            <div class="macro-val" id="d-fat">55g</div>
+            <div class="macro-name">Fat</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Macro progress bars -->
+    <div class="dash-card">
+      <div class="dash-card-title">Daily Macro Breakdown</div>
+      <div class="macro-progress" id="macro-progress"></div>
+    </div>
+
+    <!-- Meal tabs -->
+    <div class="meal-tabs">
+      <button class="meal-tab active" onclick="showMeal(0,this)">🌅 Breakfast</button>
+      <button class="meal-tab" onclick="showMeal(1,this)">☀️ Lunch</button>
+      <button class="meal-tab" onclick="showMeal(2,this)">🌆 Snack</button>
+      <button class="meal-tab" onclick="showMeal(3,this)">🌙 Dinner</button>
+    </div>
+
+    <div id="meal-display"></div>
+
+    <!-- Download bar -->
+    <div class="download-bar" id="download-bar">
+      <div class="dl-text"><b>Your personalised plan is ready!</b><br>Save it for meal prep or share with your nutritionist.</div>
+      <div style="display:flex;gap:10px;flex-shrink:0">
+        <button class="btn btn-outline btn-sm" onclick="savePlanToFirestore()">💾 Save Plan</button>
+        <button class="btn btn-primary btn-sm" onclick="downloadPlan()">⬇ Download PNG</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/diet.js"></script>
+</body>
+</html>

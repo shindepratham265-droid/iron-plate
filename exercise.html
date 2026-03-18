@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IronPlate — Exercise Plan</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="dashboard.html" class="nav-logo">
+      <div class="nav-logo-mark">IP</div>
+      <span class="nav-logo-name">IronPlate</span>
+    </a>
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link">Dashboard</a>
+      <a href="diet.html"      class="nav-link">Diet Plan</a>
+      <a href="exercise.html"  class="nav-link active">Exercise</a>
+      <a href="muscle.html"    class="nav-link">Muscle Growth</a>
+    </div>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-white btn-sm">← Dashboard</a>
+      <div class="nav-avatar" id="nav-avatar">?</div>
+    </div>
+    <button class="nav-ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mob-menu" id="mob-menu">
+  <a href="dashboard.html" class="mob-link">Dashboard</a>
+  <a href="diet.html"      class="mob-link">Diet Plan</a>
+  <a href="exercise.html"  class="mob-link active">Exercise</a>
+  <a href="muscle.html"    class="mob-link">Muscle Growth</a>
+</div>
+
+<div class="ex-wrap">
+
+  <div class="page-hero" style="margin-bottom:24px">
+    <div class="page-hero-tag">Section 02</div>
+    <h1 class="page-hero-title">Exercise Plan 🏋️</h1>
+    <p class="page-hero-sub">28+ exercises across 7 muscle groups. Click any muscle on the diagram to filter.</p>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <span class="filter-lbl">Filter:</span>
+    <div class="chips">
+      <button class="chip active" onclick="filterEx('all',this)">All</button>
+      <button class="chip" onclick="filterEx('chest',this)">💪 Chest</button>
+      <button class="chip" onclick="filterEx('back',this)">🔙 Back</button>
+      <button class="chip" onclick="filterEx('shoulders',this)">🎯 Shoulders</button>
+      <button class="chip" onclick="filterEx('arms',this)">💪 Arms</button>
+      <button class="chip" onclick="filterEx('legs',this)">🦵 Legs</button>
+      <button class="chip" onclick="filterEx('core',this)">🫀 Core</button>
+      <button class="chip" onclick="filterEx('cardio',this)">❤️ Cardio</button>
+    </div>
+  </div>
+
+  <!-- Muscle Map -->
+  <div class="muscle-map">
+    <div>
+      <div class="muscle-map-title">Click to Filter</div>
+      <svg viewBox="0 0 200 400" class="body-svg" xmlns="http://www.w3.org/2000/svg">
+        <!-- Head -->
+        <ellipse cx="100" cy="35" rx="22" ry="26" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
+        <!-- Neck -->
+        <rect x="91" y="58" width="18" height="15" rx="4" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+        <!-- Torso -->
+        <path d="M65 73 Q100 67 135 73 L140 160 Q100 170 60 160 Z" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5"/>
+        <!-- Chest L/R -->
+        <ellipse cx="83"  cy="100" rx="18" ry="15" class="muscle-zone" data-group="chest"     fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <ellipse cx="117" cy="100" rx="18" ry="15" class="muscle-zone" data-group="chest"     fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+        <!-- Shoulders -->
+        <ellipse cx="53"  cy="83"  rx="14" ry="12" class="muscle-zone" data-group="shoulders" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+        <ellipse cx="147" cy="83"  rx="14" ry="12" class="muscle-zone" data-group="shoulders" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+        <!-- Upper arms -->
+        <ellipse cx="43"  cy="118" rx="10" ry="20" class="muscle-zone" data-group="arms"      fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+        <ellipse cx="157" cy="118" rx="10" ry="20" class="muscle-zone" data-group="arms"      fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+        <!-- Forearms -->
+        <ellipse cx="37"  cy="155" rx="8"  ry="18" class="muscle-zone" data-group="arms"      fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+        <ellipse cx="163" cy="155" rx="8"  ry="18" class="muscle-zone" data-group="arms"      fill="#fee2e2" stroke="#dc2626" stroke-width="1"/>
+        <!-- Abs (4 blocks) -->
+        <rect x="82" y="118" width="15" height="12" rx="3" class="muscle-zone" data-group="core" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <rect x="82" y="135" width="15" height="12" rx="3" class="muscle-zone" data-group="core" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <rect x="103" y="118" width="15" height="12" rx="3" class="muscle-zone" data-group="core" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <rect x="103" y="135" width="15" height="12" rx="3" class="muscle-zone" data-group="core" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <!-- Obliques -->
+        <ellipse cx="71"  cy="135" rx="9"  ry="14" class="muscle-zone" data-group="core" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <ellipse cx="129" cy="135" rx="9"  ry="14" class="muscle-zone" data-group="core" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+        <!-- Hips -->
+        <path d="M65 158 L135 158 L140 185 L60 185 Z" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+        <!-- Quads -->
+        <ellipse cx="82"  cy="220" rx="18" ry="35" class="muscle-zone" data-group="legs" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <ellipse cx="118" cy="220" rx="18" ry="35" class="muscle-zone" data-group="legs" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1.5"/>
+        <!-- Knees -->
+        <ellipse cx="82"  cy="263" rx="13" ry="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+        <ellipse cx="118" cy="263" rx="13" ry="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+        <!-- Calves -->
+        <ellipse cx="82"  cy="315" rx="13" ry="28" class="muscle-zone" data-group="legs" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1"/>
+        <ellipse cx="118" cy="315" rx="13" ry="28" class="muscle-zone" data-group="legs" fill="#f3e8ff" stroke="#7c3aed" stroke-width="1"/>
+        <!-- Feet -->
+        <ellipse cx="82"  cy="363" rx="16" ry="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+        <ellipse cx="118" cy="363" rx="16" ry="8" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+      </svg>
+    </div>
+    <div>
+      <div class="muscle-map-title" style="margin-bottom:14px">Legend</div>
+      <div class="legend">
+        <div class="legend-row"><div class="legend-dot" style="background:#2563eb"></div>Chest</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#ca8a04"></div>Shoulders</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#dc2626"></div>Arms</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#16a34a"></div>Core / Abs</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#7c3aed"></div>Legs</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#0891b2"></div>Back</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#dc2626"></div>Cardio</div>
+      </div>
+      <div style="margin-top:20px;padding:14px;background:var(--blue-lt);border-radius:10px;font-size:13px;color:var(--blue)">
+        💡 Click any coloured muscle zone to filter exercises for that group.
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise Grid -->
+  <div class="ex-header">
+    <div class="ex-heading">Exercise Library</div>
+    <div class="ex-count" id="ex-count">Showing all 28 exercises</div>
+  </div>
+  <div class="ex-grid" id="ex-grid"></div>
+
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/exercise.js"></script>
+</body>
+</html>

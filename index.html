@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>IronPlate — Your Smart Fitness Companion</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="nav-logo-mark">IP</div>
+      <span class="nav-logo-name">IronPlate</span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html"    class="nav-link active">Home</a>
+      <a href="diet.html"     class="nav-link">Diet Plan</a>
+      <a href="exercise.html" class="nav-link">Exercise</a>
+      <a href="muscle.html"   class="nav-link">Muscle Growth</a>
+    </div>
+    <div class="nav-actions">
+      <a href="auth.html" class="btn btn-outline btn-sm">Log In</a>
+      <a href="auth.html" class="btn btn-primary btn-sm">Get Started</a>
+    </div>
+    <button class="nav-ham" onclick="toggleMob()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mob-menu" id="mob-menu">
+  <a href="index.html"    class="mob-link active">Home</a>
+  <a href="diet.html"     class="mob-link">Diet Plan</a>
+  <a href="exercise.html" class="mob-link">Exercise</a>
+  <a href="muscle.html"   class="mob-link">Muscle Growth</a>
+  <a href="auth.html"     class="mob-link">Log In / Register</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Science-backed fitness planning
+      </div>
+      <h1 class="hero-title">Train Smart.<br><span>Eat Right.</span><br>Grow Stronger.</h1>
+      <p class="hero-sub">IronPlate gives you a personalised diet plan, tailored exercise library, and real-time muscle growth visualisation — all in one beautiful platform.</p>
+      <div class="hero-btns">
+        <a href="auth.html" class="btn btn-primary btn-lg">Start for Free →</a>
+        <a href="#features" class="btn btn-outline btn-lg">See Features</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val">28+</div>
+          <div class="hero-stat-lbl">Exercises</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">4</div>
+          <div class="hero-stat-lbl">Meal Plans</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">7</div>
+          <div class="hero-stat-lbl">Muscle Groups</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="hero-card hero-card-1">
+          <div class="hc-icon">🥗</div>
+          <div class="hc-title">Today's Calories</div>
+          <div class="hc-sub">1,840 / 2,200 kcal</div>
+          <div class="hc-bar"><div class="hc-fill" style="width:84%"></div></div>
+        </div>
+        <div class="hero-card hero-card-main">
+          <div class="hc-icon">💪</div>
+          <div class="hc-title">Chest &amp; Triceps</div>
+          <div class="hc-sub">Day 3 — 4 exercises</div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280"><span>Bench Press</span><span style="color:#3b5bdb;font-weight:700">✓ Done</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#6b7280"><span>Cable Flyes</span><span style="color:#3b5bdb;font-weight:700">✓ Done</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#f59e0b"><span>Skull Crushers</span><span>→ Next</span></div>
+          </div>
+        </div>
+        <div class="hero-card hero-card-2">
+          <div class="hc-icon">🏃</div>
+          <div class="hc-title">Muscle Growth</div>
+          <div class="hc-sub">Day 12 streak 🔥</div>
+          <div class="hc-bar" style="margin-top:12px"><div class="hc-fill" style="width:62%;background:linear-gradient(90deg,#7048e8,#845ef7)"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-inner">
+    <div class="section-tag">What We Offer</div>
+    <h2 class="section-title">Everything you need<br>to reach your goals</h2>
+    <p class="section-sub">From personalised nutrition to a visual muscle-growth tracker — IronPlate has it all.</p>
+    <div class="features-grid">
+      <div class="feature-card" style="animation-delay:.05s">
+        <div class="fc-icon" style="background:#dbe4ff">🥗</div>
+        <div class="fc-title">Smart Diet Plan</div>
+        <div class="fc-desc">Choose your food preferences (Veg, Non-Veg, Vegan, Keto & more), set your goal — lose, gain or maintain — and get a complete 4-meal daily plan with exact protein, carbs and fat targets.</div>
+      </div>
+      <div class="feature-card" style="animation-delay:.1s">
+        <div class="fc-icon" style="background:#ede9fe">🏋️</div>
+        <div class="fc-title">Exercise Library</div>
+        <div class="fc-desc">28+ exercises across 7 muscle groups. Filter by clicking the interactive muscle diagram. Every card shows sets, reps, rest time, primary muscles and coaching tips.</div>
+      </div>
+      <div class="feature-card" style="animation-delay:.15s">
+        <div class="fc-icon" style="background:#dcfce7">💪</div>
+        <div class="fc-title">Muscle Growth Tracker</div>
+        <div class="fc-desc">Pick any exercise and watch a real human skeleton animate and grow muscle day-by-day. See exactly which muscles get bigger and how fast.</div>
+      </div>
+      <div class="feature-card" style="animation-delay:.2s">
+        <div class="fc-icon" style="background:#fef9c3">📊</div>
+        <div class="fc-title">Personal Dashboard</div>
+        <div class="fc-desc">See your daily calorie budget, macros, step count, and weekly activity in one glanceable view. All powered by your personal profile data.</div>
+      </div>
+      <div class="feature-card" style="animation-delay:.25s">
+        <div class="fc-icon" style="background:#fee2e2">⬇️</div>
+        <div class="fc-title">Download Diet Plan</div>
+        <div class="fc-desc">Save your personalised diet plan as a print-ready PDF or image — perfect for meal prepping or sharing with your nutritionist.</div>
+      </div>
+      <div class="feature-card" style="animation-delay:.3s">
+        <div class="fc-icon" style="background:#cffafe">🔒</div>
+        <div class="fc-title">Secure & Personal</div>
+        <div class="fc-desc">Your profile, goals and history are stored securely in Firebase. Login with email — your data is always yours and never sold.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-inner">
+    <div class="section-tag">How It Works</div>
+    <h2 class="section-title">Up and running in minutes</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-title">Create Account</div>
+        <div class="step-desc">Register with your name, email and password in under 30 seconds.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-title">Set Your Profile</div>
+        <div class="step-desc">Enter age, weight, height, daily steps and activity level once.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-title">Choose a Plan</div>
+        <div class="step-desc">Pick Diet, Exercise or Muscle Growth — or explore all three.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-title">Track Progress</div>
+        <div class="step-desc">Watch your dashboard update and your muscles grow day by day.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-title">Ready to build the body<br>you've always wanted?</h2>
+  <p class="cta-sub">Join IronPlate today — completely free, no credit card needed.</p>
+  <div class="cta-btns">
+    <a href="auth.html" class="btn btn-white-fill btn-lg">Create Free Account</a>
+    <a href="diet.html" class="btn btn-ghost btn-lg">Explore Plans</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">IronPlate</div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="diet.html">Diet</a>
+      <a href="exercise.html">Exercise</a>
+      <a href="muscle.html">Muscle Growth</a>
+      <a href="auth.html">Login</a>
+    </div>
+    <div class="footer-copy">© 2025 IronPlate. Built with 💙 for fitness lovers.</div>
+  </div>
+</footer>
+
+<script>
+  // scroll navbar shadow
+  window.addEventListener('scroll',()=>{
+    document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>30);
+  });
+  function toggleMob(){document.getElementById('mob-menu').classList.toggle('open')}
+</script>
+</body>
+</html>

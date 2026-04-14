@@ -34,3 +34,47 @@ function requireAuth(cb) {
     cb(user);
   });
 }
+
+// ── LocalStorage Fallback Helpers ──
+// These allow the app to work even when Firestore rules block access.
+function saveUserLocal(uid, data) {
+  try {
+    const existing = JSON.parse(localStorage.getItem('ip_user_' + uid) || '{}');
+    const merged = { ...existing, ...data };
+    localStorage.setItem('ip_user_' + uid, JSON.stringify(merged));
+  } catch(e) { console.warn('localStorage save failed:', e); }
+}
+
+function getUserLocal(uid) {
+  try {
+    return JSON.parse(localStorage.getItem('ip_user_' + uid) || 'null');
+  } catch(e) { return null; }
+}
+
+// Unified save: tries Firestore first, always saves to localStorage as backup
+async function saveUserData(uid, data) {
+  // Always save locally first so the app works immediately
+  saveUserLocal(uid, data);
+  try {
+    await db.collection('users').doc(uid).set(data, { merge: true });
+    console.log('✅ Saved to Firestore');
+  } catch(e) {
+    console.warn('⚠️ Firestore write blocked (check rules), using localStorage:', e.message);
+  }
+}
+
+// Unified read: tries Firestore first, falls back to localStorage
+async function getUserData(uid) {
+  try {
+    const doc = await db.collection('users').doc(uid).get();
+    if (doc.exists) {
+      const data = doc.data();
+      saveUserLocal(uid, data); // sync to local
+      return data;
+    }
+  } catch(e) {
+    console.warn('⚠️ Firestore read blocked (check rules), using localStorage:', e.message);
+  }
+  // Fallback to localStorage
+  return getUserLocal(uid);
+}

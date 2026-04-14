@@ -16,8 +16,8 @@ auth.onAuthStateChanged(user => {
 
   if (user) {
     // User is genuinely already signed in — send them home
-    db.collection('users').doc(user.uid).get().then(doc => {
-      if (doc.exists && doc.data().profileComplete) {
+    getUserData(user.uid).then(data => {
+      if (data && data.profileComplete) {
         window.location.href = 'dashboard.html';
       } else {
         window.location.href = 'profile.html';
@@ -77,8 +77,8 @@ async function doLogin() {
     showToast('Welcome back! 👋', '✅');
     // Check if profile complete
     const user = auth.currentUser;
-    const doc  = await db.collection('users').doc(user.uid).get();
-    if (doc.exists && doc.data().profileComplete) {
+    const data = await getUserData(user.uid);
+    if (data && data.profileComplete) {
       window.location.href = 'dashboard.html';
     } else {
       window.location.href = 'profile.html';
@@ -114,19 +114,14 @@ async function doRegister() {
     // Step 2: Set display name
     await cred.user.updateProfile({ displayName: `${first} ${last}` });
 
-    // Step 3: Save user doc to Firestore
-    // If this fails we still proceed — profile.js will create it on save
-    try {
-      await db.collection('users').doc(cred.user.uid).set({
-        firstName:       first,
-        lastName:        last,
-        email:           email,
-        createdAt:       firebase.firestore.FieldValue.serverTimestamp(),
-        profileComplete: false
-      });
-    } catch(dbErr) {
-      console.warn('Firestore write failed (check rules), continuing anyway:', dbErr.message);
-    }
+    // Step 3: Save user doc (Firestore + localStorage fallback)
+    await saveUserData(cred.user.uid, {
+      firstName:       first,
+      lastName:        last,
+      email:           email,
+      createdAt:       new Date().toISOString(),
+      profileComplete: false
+    });
 
     showToast("Account created! Let's set up your profile 🎉", '✅');
     window.location.href = 'profile.html';

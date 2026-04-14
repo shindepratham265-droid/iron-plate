@@ -1,193 +1,353 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>IronPlate — Muscle Growth</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>IronPlate — 3D Muscle Guide</title>
+  <meta name="description"
+    content="Interactive 3D muscle model. Rotate, zoom, click any muscle for exercises & diet tips." />
+  <link rel="stylesheet" href="css/style.css" />
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <!-- Three.js r128 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body>
 
-<nav class="navbar" id="navbar">
-  <div class="nav-inner">
-    <a href="dashboard.html" class="nav-logo">
-      <div class="nav-logo-mark">IP</div>
-      <span class="nav-logo-name">IronPlate</span>
-    </a>
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link">Dashboard</a>
-      <a href="diet.html"      class="nav-link">Diet Plan</a>
-      <a href="exercise.html"  class="nav-link">Exercise</a>
-      <a href="muscle.html"    class="nav-link active">Muscle Growth</a>
-    </div>
-    <div class="nav-actions">
-      <a href="dashboard.html" class="btn btn-white btn-sm">← Dashboard</a>
-      <div class="nav-avatar" id="nav-avatar">?</div>
-    </div>
-    <button class="nav-ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-<div class="mob-menu" id="mob-menu">
-  <a href="dashboard.html" class="mob-link">Dashboard</a>
-  <a href="diet.html"      class="mob-link">Diet Plan</a>
-  <a href="exercise.html"  class="mob-link">Exercise</a>
-  <a href="muscle.html"    class="mob-link active">Muscle Growth</a>
-</div>
-
-<div class="muscle-wrap">
-
-  <div class="page-hero">
-    <div class="page-hero-tag">Section 03</div>
-    <h1 class="page-hero-title">Muscle Growth Tracker 💪</h1>
-    <p class="page-hero-sub">Pick an exercise, adjust the day slider, and watch your skeleton grow stronger.</p>
-  </div>
-
-  <div class="muscle-builder">
-
-    <!-- Left: Skeleton Display -->
-    <div>
-      <div class="skeleton-display">
-        <div class="skeleton-title" id="sk-title">Select an exercise to begin</div>
-        <div class="skeleton-sub" id="sk-sub">Your muscle growth simulation will appear here</div>
-
-        <!-- Progress bar (day tracking strip) -->
-        <div class="growth-strip" id="growth-strip" style="display:none">
-          <div class="gs-title">Growth Timeline</div>
-          <div class="gs-bar-wrap" id="growth-bars"></div>
-        </div>
-
-        <!-- Skeleton SVG -->
-        <div class="skeleton-svg-wrap">
-          <svg id="skeleton-svg" viewBox="0 0 200 440" class="skeleton-svg" xmlns="http://www.w3.org/2000/svg">
-
-            <!-- ── BONE STRUCTURE (always visible, white/grey) ── -->
-            <!-- Head -->
-            <ellipse cx="100" cy="32" rx="19" ry="22" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-            <!-- Spine -->
-            <line x1="100" y1="54" x2="100" y2="175" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
-            <!-- Clavicle -->
-            <line x1="65" y1="72" x2="100" y2="68" stroke="#cbd5e1" stroke-width="2.5"/>
-            <line x1="135" y1="72" x2="100" y2="68" stroke="#cbd5e1" stroke-width="2.5"/>
-            <!-- Rib cage -->
-            <ellipse cx="100" cy="110" rx="30" ry="36" fill="none" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4 3"/>
-            <!-- Pelvis -->
-            <path d="M72 178 Q100 192 128 178 L132 200 Q100 210 68 200 Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-            <!-- Left arm bones -->
-            <line x1="65" y1="74" x2="42" y2="130" stroke="#cbd5e1" stroke-width="2"/>
-            <line x1="42" y1="130" x2="32" y2="172" stroke="#cbd5e1" stroke-width="2"/>
-            <!-- Right arm bones -->
-            <line x1="135" y1="74" x2="158" y2="130" stroke="#cbd5e1" stroke-width="2"/>
-            <line x1="158" y1="130" x2="168" y2="172" stroke="#cbd5e1" stroke-width="2"/>
-            <!-- Left leg bones -->
-            <line x1="85" y1="205" x2="82" y2="285" stroke="#cbd5e1" stroke-width="2.5"/>
-            <line x1="82" y1="285" x2="80" y2="370" stroke="#cbd5e1" stroke-width="2"/>
-            <!-- Right leg bones -->
-            <line x1="115" y1="205" x2="118" y2="285" stroke="#cbd5e1" stroke-width="2.5"/>
-            <line x1="118" y1="285" x2="120" y2="370" stroke="#cbd5e1" stroke-width="2"/>
-            <!-- Feet -->
-            <ellipse cx="78"  cy="375" rx="12" ry="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-            <ellipse cx="122" cy="375" rx="12" ry="6" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-
-            <!-- ── MUSCLE GROUPS (controlled by JS opacity & size) ── -->
-            <!-- Chest L -->
-            <ellipse id="m-chest-l" cx="84" cy="100" rx="0" ry="0" fill="rgba(59,91,219,0.7)" style="transition:all 1s ease"/>
-            <!-- Chest R -->
-            <ellipse id="m-chest-r" cx="116" cy="100" rx="0" ry="0" fill="rgba(59,91,219,0.7)" style="transition:all 1s ease"/>
-            <!-- Shoulder L -->
-            <ellipse id="m-sho-l" cx="58" cy="80" rx="0" ry="0" fill="rgba(217,119,6,0.75)" style="transition:all 1s ease"/>
-            <!-- Shoulder R -->
-            <ellipse id="m-sho-r" cx="142" cy="80" rx="0" ry="0" fill="rgba(217,119,6,0.75)" style="transition:all 1s ease"/>
-            <!-- Bicep L -->
-            <ellipse id="m-bi-l" cx="44" cy="114" rx="0" ry="0" fill="rgba(220,38,38,0.75)" style="transition:all 1s ease"/>
-            <!-- Bicep R -->
-            <ellipse id="m-bi-r" cx="156" cy="114" rx="0" ry="0" fill="rgba(220,38,38,0.75)" style="transition:all 1s ease"/>
-            <!-- Tricep L -->
-            <ellipse id="m-tri-l" cx="44" cy="130" rx="0" ry="0" fill="rgba(124,58,237,0.7)" style="transition:all 1s ease"/>
-            <!-- Tricep R -->
-            <ellipse id="m-tri-r" cx="156" cy="130" rx="0" ry="0" fill="rgba(124,58,237,0.7)" style="transition:all 1s ease"/>
-            <!-- Forearm L -->
-            <ellipse id="m-fa-l" cx="34" cy="158" rx="0" ry="0" fill="rgba(220,38,38,0.6)" style="transition:all 1s ease"/>
-            <!-- Forearm R -->
-            <ellipse id="m-fa-r" cx="166" cy="158" rx="0" ry="0" fill="rgba(220,38,38,0.6)" style="transition:all 1s ease"/>
-            <!-- Back / Lats L -->
-            <ellipse id="m-lat-l" cx="76" cy="115" rx="0" ry="0" fill="rgba(8,145,178,0.65)" style="transition:all 1s ease"/>
-            <!-- Back / Lats R -->
-            <ellipse id="m-lat-r" cx="124" cy="115" rx="0" ry="0" fill="rgba(8,145,178,0.65)" style="transition:all 1s ease"/>
-            <!-- Abs -->
-            <rect id="m-abs" x="0" y="0" width="0" height="0" rx="4" fill="rgba(22,163,74,0.65)" style="transition:all 1s ease"/>
-            <!-- Obliques L -->
-            <ellipse id="m-obl-l" cx="73" cy="138" rx="0" ry="0" fill="rgba(22,163,74,0.55)" style="transition:all 1s ease"/>
-            <!-- Obliques R -->
-            <ellipse id="m-obl-r" cx="127" cy="138" rx="0" ry="0" fill="rgba(22,163,74,0.55)" style="transition:all 1s ease"/>
-            <!-- Quad L -->
-            <ellipse id="m-quad-l" cx="84" cy="238" rx="0" ry="0" fill="rgba(124,58,237,0.7)" style="transition:all 1s ease"/>
-            <!-- Quad R -->
-            <ellipse id="m-quad-r" cx="116" cy="238" rx="0" ry="0" fill="rgba(124,58,237,0.7)" style="transition:all 1s ease"/>
-            <!-- Hamstring L -->
-            <ellipse id="m-ham-l" cx="84" cy="248" rx="0" ry="0" fill="rgba(109,40,217,0.6)" style="transition:all 1s ease"/>
-            <!-- Hamstring R -->
-            <ellipse id="m-ham-r" cx="116" cy="248" rx="0" ry="0" fill="rgba(109,40,217,0.6)" style="transition:all 1s ease"/>
-            <!-- Glute L -->
-            <ellipse id="m-glu-l" cx="87" cy="200" rx="0" ry="0" fill="rgba(124,58,237,0.65)" style="transition:all 1s ease"/>
-            <!-- Glute R -->
-            <ellipse id="m-glu-r" cx="113" cy="200" rx="0" ry="0" fill="rgba(124,58,237,0.65)" style="transition:all 1s ease"/>
-            <!-- Calf L -->
-            <ellipse id="m-calf-l" cx="82" cy="330" rx="0" ry="0" fill="rgba(124,58,237,0.65)" style="transition:all 1s ease"/>
-            <!-- Calf R -->
-            <ellipse id="m-calf-r" cx="118" cy="330" rx="0" ry="0" fill="rgba(124,58,237,0.65)" style="transition:all 1s ease"/>
-
-            <!-- Day label overlay -->
-            <text id="day-overlay" x="100" y="420" text-anchor="middle"
-              font-family="Syne,sans-serif" font-size="14" font-weight="800"
-              fill="var(--blue)" opacity="0">Day 0</text>
-
-          </svg>
-        </div>
-
-        <!-- Muscle growth progress bars -->
-        <div class="muscle-progress-list" id="muscle-progress-list"></div>
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="dashboard.html" class="nav-logo">
+        <div class="nav-logo-mark">IP</div>
+        <span class="nav-logo-name">IronPlate</span>
+      </a>
+      <div class="nav-links">
+        <a href="dashboard.html" class="nav-link">Dashboard</a>
+        <a href="diet.html" class="nav-link">Diet Plan</a>
+        <a href="exercise.html" class="nav-link">Exercise</a>
+        <a href="muscle.html" class="nav-link active">Muscle Guide</a>
+        <a href="profile.html" class="nav-link">Profile</a>
       </div>
+      <div class="nav-actions">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+      </div>
+      <button class="nav-ham" onclick="toggleMob()"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+  <div class="mob-menu" id="mob-menu">
+    <a href="dashboard.html" class="mob-link">Dashboard</a>
+    <a href="diet.html" class="mob-link">Diet Plan</a>
+    <a href="exercise.html" class="mob-link">Exercise</a>
+    <a href="muscle.html" class="mob-link active">Muscle Guide</a>
+    <a href="profile.html" class="mob-link">Profile</a>
+  </div>
+
+  <div class="muscle-wrap">
+
+    <div class="page-hero">
+      <div class="page-hero-tag">3D Interactive · Muscle Guide</div>
+      <h1 class="page-hero-title">3D Muscle Guide 💪</h1>
+      <p class="page-hero-sub">Rotate, zoom, and click any muscle group on the 3D model to see targeted exercises and
+        nutrition tips.</p>
     </div>
 
-    <!-- Right: Controls -->
-    <div class="exercise-selector-card">
-      <div class="ex-sel-title">🏋️ Choose Exercise</div>
-      <div class="ex-sel-grid" id="ex-sel-grid"></div>
+    <!-- Tab switcher -->
+    <div class="muscle-tabs-row">
+      <button class="muscle-mode-tab active" id="tab-3d" onclick="switchMode('3d')">🔵 3D Interactive Model</button>
+      <button class="muscle-mode-tab" id="tab-2d" onclick="switchMode('2d')">📊 Growth Tracker</button>
+    </div>
 
-      <div class="day-slider-wrap" id="day-slider-wrap" style="display:none">
-        <div class="day-display">
-          <div>
-            <div class="day-label">Training Days</div>
-            <div class="day-num" id="day-num-display">0</div>
+    <!-- ══════════ 3D MODEL SECTION ══════════ -->
+    <div id="mode-3d" class="muscle-3d-section">
+      <div class="muscle-3d-layout">
+
+        <!-- Left: Three.js canvas -->
+        <div class="canvas-col">
+          <div class="canvas-card">
+            <div class="canvas-controls-hint">
+              <span>🖱️ Drag to rotate</span>
+              <span>🔍 Scroll to zoom</span>
+              <span>👆 Click muscle to inspect</span>
+            </div>
+            <div id="threejs-container"></div>
+            <div class="canvas-footer">
+              <button class="btn btn-outline btn-sm" onclick="resetCamera()">↺ Reset View</button>
+              <button class="btn btn-outline btn-sm" onclick="toggleWireframe()">⬡ Wireframe</button>
+              <div class="view-btns">
+                <button class="view-btn active" onclick="setView('front')" id="vbtn-front">Front</button>
+                <button class="view-btn" onclick="setView('back')" id="vbtn-back">Back</button>
+                <button class="view-btn" onclick="setView('side')" id="vbtn-side">Side</button>
+              </div>
+            </div>
           </div>
-          <div class="day-streak" id="day-streak">🔥 Start</div>
+
+          <!-- Muscle group legend -->
+          <div class="muscle-legend-card">
+            <div class="mlc-title">Click a muscle group</div>
+            <div class="mlc-grid" id="mlc-grid">
+              <!-- populated by JS -->
+            </div>
+          </div>
         </div>
-        <input type="range" class="range-input" id="day-range"
-          min="0" max="90" value="0"
-          oninput="onDayChange(this.value)"/>
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
-          <span>Day 0</span><span>Day 30</span><span>Day 60</span><span>Day 90</span>
+
+        <!-- Right: Info panel -->
+        <div class="info-col">
+          <!-- Default state -->
+          <div class="mip-default" id="mip-default">
+            <div class="mip-default-icon">💪</div>
+            <div class="mip-default-title">Select a Muscle</div>
+            <div class="mip-default-sub">Click any highlighted muscle on the 3D model or choose from the legend below to
+              see exercises, diet tips, and growth stats.</div>
+            <div class="quick-select-grid">
+              <button class="qs-btn" onclick="selectMuscle3d('chest')">🫀 Chest</button>
+              <button class="qs-btn" onclick="selectMuscle3d('shoulders')">⬆️ Shoulders</button>
+              <button class="qs-btn" onclick="selectMuscle3d('biceps')">💪 Biceps</button>
+              <button class="qs-btn" onclick="selectMuscle3d('triceps')">🔱 Triceps</button>
+              <button class="qs-btn" onclick="selectMuscle3d('lats')">🪃 Back</button>
+              <button class="qs-btn" onclick="selectMuscle3d('abs')">⬡ Core</button>
+              <button class="qs-btn" onclick="selectMuscle3d('quads')">🦵 Quads</button>
+              <button class="qs-btn" onclick="selectMuscle3d('hamstrings')">🏃 Hamstrings</button>
+              <button class="qs-btn" onclick="selectMuscle3d('glutes')">🍑 Glutes</button>
+              <button class="qs-btn" onclick="selectMuscle3d('calves')">🦿 Calves</button>
+            </div>
+          </div>
+
+          <!-- Muscle detail panel (hidden until selection) -->
+          <div class="muscle-info-panel" id="muscle-info-panel" style="display:none">
+            <div class="mip-header">
+              <div class="mip-icon" id="mip-icon">💪</div>
+              <div>
+                <div class="mip-name" id="mip-name">Muscle Name</div>
+                <div class="mip-sub" id="mip-sub">Details</div>
+              </div>
+              <button class="mip-close" onclick="closeMusclePanel()">✕</button>
+            </div>
+
+            <!-- AI Tip banner -->
+            <div class="mip-ai-tip" id="mip-ai-tip" style="display:none">
+              <span class="ai-badge" style="font-size:11px">✨ AI Tip</span>
+              <span id="mip-ai-text" style="font-size:13px;color:var(--text);flex:1"></span>
+            </div>
+
+            <div class="mip-section">
+              <div class="mip-section-title">🏋️ Top Exercises</div>
+              <div class="mip-exercises" id="mip-exercises"></div>
+            </div>
+            <div class="mip-section">
+              <div class="mip-section-title">🥗 Diet Tips</div>
+              <div class="mip-diet" id="mip-diet"></div>
+            </div>
+            <div class="mip-section">
+              <div class="mip-section-title">📊 Growth Stats</div>
+              <div class="mip-stats" id="mip-stats"></div>
+            </div>
+          </div>
+
+        </div><!-- /info-col -->
+      </div><!-- /muscle-3d-layout -->
+    </div><!-- /mode-3d -->
+
+
+    <!-- ══════════ GROWTH TRACKER SECTION (original) ══════════ -->
+    <div id="mode-2d" class="muscle-builder" style="display:none">
+
+      <div class="muscle-left-col">
+        <div class="muscle-click-tip" id="muscle-click-tip">
+          👆 <strong>Click any glowing muscle</strong> on the body to see targeted exercises and nutrition tips
+        </div>
+
+        <div class="skeleton-display">
+          <div class="skeleton-title" id="sk-title">Select an exercise to begin</div>
+          <div class="skeleton-sub" id="sk-sub">Your muscle growth simulation will appear here</div>
+
+          <div class="growth-strip" id="growth-strip" style="display:none">
+            <div class="gs-title">Growth Timeline</div>
+            <div class="gs-bar-wrap" id="growth-bars"></div>
+          </div>
+
+          <div class="skeleton-svg-wrap">
+            <svg id="skeleton-svg" viewBox="0 0 220 460" class="skeleton-svg" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="110" cy="32" rx="20" ry="23" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2" />
+              <rect x="104" y="53" width="12" height="14" rx="5" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+              <line x1="110" y1="67" x2="110" y2="185" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round" />
+              <line x1="72" y1="76" x2="110" y2="72" stroke="#cbd5e1" stroke-width="2.5" />
+              <line x1="148" y1="76" x2="110" y2="72" stroke="#cbd5e1" stroke-width="2.5" />
+              <ellipse cx="110" cy="115" rx="32" ry="38" fill="none" stroke="#e2e8f0" stroke-width="1.5"
+                stroke-dasharray="4 3" />
+              <path d="M78 188 Q110 204 142 188 L146 212 Q110 224 74 212 Z" fill="#f1f5f9" stroke="#cbd5e1"
+                stroke-width="1.5" />
+              <line x1="72" y1="78" x2="48" y2="138" stroke="#cbd5e1" stroke-width="2.5" />
+              <line x1="48" y1="138" x2="36" y2="184" stroke="#cbd5e1" stroke-width="2" />
+              <line x1="148" y1="78" x2="172" y2="138" stroke="#cbd5e1" stroke-width="2.5" />
+              <line x1="172" y1="138" x2="184" y2="184" stroke="#cbd5e1" stroke-width="2" />
+              <ellipse cx="34" cy="190" rx="9" ry="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+              <ellipse cx="186" cy="190" rx="9" ry="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+              <line x1="92" y1="216" x2="88" y2="305" stroke="#cbd5e1" stroke-width="3" />
+              <line x1="128" y1="216" x2="132" y2="305" stroke="#cbd5e1" stroke-width="3" />
+              <line x1="88" y1="305" x2="86" y2="395" stroke="#cbd5e1" stroke-width="2.5" />
+              <line x1="132" y1="305" x2="134" y2="395" stroke="#cbd5e1" stroke-width="2.5" />
+              <circle cx="88" cy="308" r="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+              <circle cx="132" cy="308" r="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+              <ellipse cx="84" cy="400" rx="13" ry="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+              <ellipse cx="136" cy="400" rx="13" ry="7" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5" />
+
+              <ellipse id="m-chest-l" class="muscle-zone" cx="92" cy="104" rx="0" ry="0" fill="rgba(220,50,50,0.0)"
+                stroke="rgba(220,50,50,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('chest')" data-muscle="chest" />
+              <ellipse id="m-chest-r" class="muscle-zone" cx="128" cy="104" rx="0" ry="0" fill="rgba(220,50,50,0.0)"
+                stroke="rgba(220,50,50,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('chest')" data-muscle="chest" />
+              <ellipse id="m-sho-l" class="muscle-zone" cx="64" cy="84" rx="0" ry="0" fill="rgba(210,80,40,0.0)"
+                stroke="rgba(210,80,40,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('shoulders')" data-muscle="shoulders" />
+              <ellipse id="m-sho-r" class="muscle-zone" cx="156" cy="84" rx="0" ry="0" fill="rgba(210,80,40,0.0)"
+                stroke="rgba(210,80,40,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('shoulders')" data-muscle="shoulders" />
+              <ellipse id="m-bi-l" class="muscle-zone" cx="48" cy="118" rx="0" ry="0" fill="rgba(200,60,60,0.0)"
+                stroke="rgba(200,60,60,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('biceps')" data-muscle="biceps" />
+              <ellipse id="m-bi-r" class="muscle-zone" cx="172" cy="118" rx="0" ry="0" fill="rgba(200,60,60,0.0)"
+                stroke="rgba(200,60,60,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('biceps')" data-muscle="biceps" />
+              <ellipse id="m-tri-l" class="muscle-zone" cx="50" cy="138" rx="0" ry="0" fill="rgba(180,50,80,0.0)"
+                stroke="rgba(180,50,80,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('triceps')" data-muscle="triceps" />
+              <ellipse id="m-tri-r" class="muscle-zone" cx="170" cy="138" rx="0" ry="0" fill="rgba(180,50,80,0.0)"
+                stroke="rgba(180,50,80,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('triceps')" data-muscle="triceps" />
+              <ellipse id="m-fa-l" class="muscle-zone" cx="40" cy="165" rx="0" ry="0" fill="rgba(190,70,60,0.0)"
+                stroke="rgba(190,70,60,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('forearms')" data-muscle="forearms" />
+              <ellipse id="m-fa-r" class="muscle-zone" cx="180" cy="165" rx="0" ry="0" fill="rgba(190,70,60,0.0)"
+                stroke="rgba(190,70,60,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('forearms')" data-muscle="forearms" />
+              <ellipse id="m-lat-l" class="muscle-zone" cx="82" cy="122" rx="0" ry="0" fill="rgba(180,45,45,0.0)"
+                stroke="rgba(180,45,45,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('lats')" data-muscle="lats" />
+              <ellipse id="m-lat-r" class="muscle-zone" cx="138" cy="122" rx="0" ry="0" fill="rgba(180,45,45,0.0)"
+                stroke="rgba(180,45,45,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('lats')" data-muscle="lats" />
+              <rect id="m-abs" x="0" y="0" width="0" height="0" rx="5" fill="rgba(200,60,60,0.0)"
+                stroke="rgba(200,60,60,0)" class="muscle-zone" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('abs')" data-muscle="abs" />
+              <ellipse id="m-obl-l" class="muscle-zone" cx="78" cy="148" rx="0" ry="0" fill="rgba(190,55,55,0.0)"
+                stroke="rgba(190,55,55,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('abs')" data-muscle="abs" />
+              <ellipse id="m-obl-r" class="muscle-zone" cx="142" cy="148" rx="0" ry="0" fill="rgba(190,55,55,0.0)"
+                stroke="rgba(190,55,55,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('abs')" data-muscle="abs" />
+              <ellipse id="m-quad-l" class="muscle-zone" cx="91" cy="252" rx="0" ry="0" fill="rgba(210,55,55,0.0)"
+                stroke="rgba(210,55,55,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('quads')" data-muscle="quads" />
+              <ellipse id="m-quad-r" class="muscle-zone" cx="129" cy="252" rx="0" ry="0" fill="rgba(210,55,55,0.0)"
+                stroke="rgba(210,55,55,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('quads')" data-muscle="quads" />
+              <ellipse id="m-ham-l" class="muscle-zone" cx="91" cy="262" rx="0" ry="0" fill="rgba(185,48,48,0.0)"
+                stroke="rgba(185,48,48,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('hamstrings')" data-muscle="hamstrings" />
+              <ellipse id="m-ham-r" class="muscle-zone" cx="129" cy="262" rx="0" ry="0" fill="rgba(185,48,48,0.0)"
+                stroke="rgba(185,48,48,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('hamstrings')" data-muscle="hamstrings" />
+              <ellipse id="m-glu-l" class="muscle-zone" cx="93" cy="215" rx="0" ry="0" fill="rgba(195,55,55,0.0)"
+                stroke="rgba(195,55,55,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('glutes')" data-muscle="glutes" />
+              <ellipse id="m-glu-r" class="muscle-zone" cx="127" cy="215" rx="0" ry="0" fill="rgba(195,55,55,0.0)"
+                stroke="rgba(195,55,55,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('glutes')" data-muscle="glutes" />
+              <ellipse id="m-calf-l" class="muscle-zone" cx="88" cy="352" rx="0" ry="0" fill="rgba(200,58,58,0.0)"
+                stroke="rgba(200,58,58,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('calves')" data-muscle="calves" />
+              <ellipse id="m-calf-r" class="muscle-zone" cx="132" cy="352" rx="0" ry="0" fill="rgba(200,58,58,0.0)"
+                stroke="rgba(200,58,58,0)" style="transition:all 0.9s ease;cursor:pointer"
+                onclick="onMuscleClick('calves')" data-muscle="calves" />
+
+              <text id="day-overlay" x="110" y="438" text-anchor="middle" font-family="Syne,sans-serif" font-size="15"
+                font-weight="800" fill="var(--blue)" opacity="0">Day 0</text>
+              <defs>
+                <filter id="muscle-glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur" />
+                  <feMerge>
+                    <feMergeNode in="coloredBlur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+            </svg>
+          </div>
+
+          <div class="muscle-progress-list" id="muscle-progress-list"></div>
         </div>
       </div>
 
-      <!-- Info card -->
-      <div id="ex-info-card" style="display:none;margin-top:16px;padding:14px;background:var(--bg);border-radius:10px">
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:6px">Primary Muscles</div>
-        <div id="ex-info-muscles" style="font-size:13px;color:var(--text);line-height:1.8"></div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:10px 0 6px">Growth Rate</div>
-        <div id="ex-info-rate" style="font-size:13px;color:var(--muted);line-height:1.7"></div>
+      <div class="muscle-right-col">
+        <div class="exercise-selector-card">
+          <div class="ex-sel-title">🏋️ Choose Exercise</div>
+          <div class="ex-sel-grid" id="ex-sel-grid"></div>
+
+          <div class="day-slider-wrap" id="day-slider-wrap" style="display:none">
+            <div class="day-display">
+              <div>
+                <div class="day-label">Training Days</div>
+                <div class="day-num" id="day-num-display">0</div>
+              </div>
+              <div class="day-streak" id="day-streak">🔥 Start</div>
+            </div>
+            <input type="range" class="range-input" id="day-range" min="0" max="90" value="0"
+              oninput="onDayChange(this.value)" />
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+              <span>Day 0</span><span>Day 30</span><span>Day 60</span><span>Day 90</span>
+            </div>
+          </div>
+
+          <div id="ex-info-card"
+            style="display:none;margin-top:16px;padding:14px;background:var(--bg);border-radius:10px">
+            <div
+              style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--blue);margin-bottom:6px">
+              Primary Muscles</div>
+            <div id="ex-info-muscles" style="font-size:13px;color:var(--text);line-height:1.8"></div>
+            <div
+              style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:10px 0 6px">
+              Growth Rate</div>
+            <div id="ex-info-rate" style="font-size:13px;color:var(--muted);line-height:1.7"></div>
+          </div>
+
+          <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:16px"
+            onclick="resetGrowth()">↺ Reset</button>
+        </div>
+
+        <div class="muscle-info-panel" id="muscle-info-panel-2d" style="display:none">
+          <div class="mip-header">
+            <div class="mip-icon" id="mip-icon-2d">💪</div>
+            <div>
+              <div class="mip-name" id="mip-name-2d">Muscle Name</div>
+              <div class="mip-sub" id="mip-sub-2d">Click a muscle group</div>
+            </div>
+            <button class="mip-close" onclick="closeMusclePanel2d()">✕</button>
+          </div>
+          <div class="mip-section">
+            <div class="mip-section-title">🏋️ Top Exercises</div>
+            <div class="mip-exercises" id="mip-exercises-2d"></div>
+          </div>
+          <div class="mip-section">
+            <div class="mip-section-title">🥗 Diet Tips</div>
+            <div class="mip-diet" id="mip-diet-2d"></div>
+          </div>
+          <div class="mip-section">
+            <div class="mip-section-title">📊 Growth Stats</div>
+            <div class="mip-stats" id="mip-stats-2d"></div>
+          </div>
+        </div>
       </div>
 
-      <button class="btn btn-outline btn-sm" style="width:100%;justify-content:center;margin-top:16px" onclick="resetGrowth()">↺ Reset</button>
-    </div>
+    </div><!-- /mode-2d -->
 
-  </div>
-</div>
+  </div><!-- /muscle-wrap -->
 
-<script src="js/firebase-config.js"></script>
-<script src="js/muscle.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/muscle.js"></script>
+  <script src="js/muscle3d.js"></script>
 </body>
+
 </html>

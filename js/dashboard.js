@@ -15,13 +15,12 @@ requireAuth(async user => {
   const name  = user.displayName ? user.displayName.split(' ')[0] : 'there';
   document.getElementById('greeting').textContent = `${greet}, ${name}! 👋`;
 
-  // Load profile from Firestore
-  const doc = await db.collection('users').doc(user.uid).get();
-  if (!doc.exists || !doc.data().profileComplete) {
+  // Load profile from Firestore (with localStorage fallback)
+  const p = await getUserData(user.uid);
+  if (!p || !p.profileComplete) {
     window.location.href = 'profile.html';
     return;
   }
-  const p = doc.data();
   document.getElementById('dash-sub').textContent = `${p.goal ? goalLabel(p.goal) : ''} · ${p.weight} kg · ${p.height} cm`;
 
   // Stats

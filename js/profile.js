@@ -6,7 +6,7 @@ let currentStep = 1;
 // ── Fade in once Firebase settles — prevents flash/redirect before auth loads ──
 document.body.style.opacity = '0';
 
-auth.onAuthStateChanged(user => {
+auth.onAuthStateChanged(async user => {
   document.body.style.opacity = '1';
   document.body.style.transition = 'opacity .25s';
 
@@ -19,17 +19,14 @@ auth.onAuthStateChanged(user => {
     (user.displayName || user.email)[0].toUpperCase();
 
   // Only redirect to dashboard if profile is already complete
-  db.collection('users').doc(user.uid).get()
-    .then(doc => {
-      if (doc.exists && doc.data().profileComplete) {
-        window.location.href = 'dashboard.html';
-      }
-      // If doc doesn't exist yet or profileComplete=false — stay on page
-    })
-    .catch(err => {
-      // Firestore read error (rules not set) — still allow form fill
-      console.warn('Profile read error (check Firestore rules):', err.message);
-    });
+  try {
+    const data = await getUserData(user.uid);
+    if (data && data.profileComplete) {
+      window.location.href = 'dashboard.html';
+    }
+  } catch(err) {
+    console.warn('Profile read error:', err.message);
+  }
 });
 
 // ── Step navigation ──
@@ -150,10 +147,8 @@ function calcPreview() {
   profileData.targetCal = targetCal;
 }
 
-// ── Save to Firestore ──
-// Uses set() with merge:true so it works whether the doc exists or not.
-// The earlier Firestore write in auth.js may have failed if rules were
-// restrictive — this call will create OR update the document safely.
+// ── Save profile ──
+// Uses saveUserData() which tries Firestore first, falls back to localStorage.
 async function saveProfile() {
   if (!validateStep(2)) { goStep(2); return; }
   if (!profileData.goal) {
@@ -168,14 +163,11 @@ async function saveProfile() {
     const user = auth.currentUser;
     if (!user) throw new Error('Not authenticated');
 
-    await db.collection('users').doc(user.uid).set(
-      {
-        ...profileData,
-        profileComplete: true,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      },
-      { merge: true }   // ← creates doc if missing, updates if exists
-    );
+    await saveUserData(user.uid, {
+      ...profileData,
+      profileComplete: true,
+      updatedAt: new Date().toISOString()
+    });
 
     showToast('Profile saved! Welcome to IronPlate 🎉', '🚀');
     setTimeout(() => window.location.href = 'dashboard.html', 900);
